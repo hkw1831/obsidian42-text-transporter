@@ -1,6 +1,6 @@
 import { TFile, getLinkpath, Editor, Notice } from "obsidian";
 import ThePlugin from "../main";
-import { GenericFuzzySuggester, SuggesterItem } from "../ui/GenericFuzzySuggester";
+import { GenericFuzzySuggester, SuggesterItem } from "../ui/genericFuzzySuggester";
 import { getDnpForToday } from "./dailyNotesPages";
 import { blocksWhereTagIsUsed, filesWhereTagIsUsed, getAllTagsJustTagNames } from "./tags";
 import { getActiveView, getActiveViewType, ViewType } from "./views";
@@ -60,6 +60,24 @@ export async function convertFileIntoArray(plugin: ThePlugin, filePath: string):
     for (const [key, value] of Object.entries((await plugin.app.vault.adapter.read(filePath)).split('\n')))
         fileContentsArray.push({ display: value, info: key });
     return fileContentsArray;
+}
+
+export async function openFileInObsidianInSameTab(plugin: ThePlugin, filePath: string, gotoStartLineNumber = 0, lineCount = 0): Promise<void> {
+    // const newLeaf = plugin.app.workspace.splitActiveLeaf('vertical');
+    const newLeaf = plugin.app.workspace.getLeaf(false);
+    const file: TFile = plugin.app.metadataCache.getFirstLinkpathDest(getLinkpath(filePath), "/");
+    await newLeaf.openFile(file, { active: true });
+    setTimeout(async () => {
+        const editor: Editor = getActiveView(plugin).editor;
+        editor.setSelection(
+            { line: gotoStartLineNumber, ch: 0 },
+            { line: gotoStartLineNumber + lineCount, ch: editor.getLine(gotoStartLineNumber + lineCount).length }
+        );
+        editor.scrollIntoView({
+            from: { line: gotoStartLineNumber + lineCount, ch: 0 },
+            to: { line: gotoStartLineNumber + lineCount, ch: 0 }
+        });
+    }, 500);
 }
 
 export async function openFileInObsidian(plugin: ThePlugin, filePath: string, gotoStartLineNumber = 0, lineCount = 0): Promise<void> {

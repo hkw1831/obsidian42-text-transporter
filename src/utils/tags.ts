@@ -1,6 +1,6 @@
-import { CachedMetadata, App, Pos } from "obsidian";
+import { CachedMetadata, App, Pos, parseFrontMatterTags, parseFrontMatterAliases } from "obsidian";
 import ThePlugin from "../main";
-import { FileCacheAnalyzer } from "./FileCacheAnalyzer";
+import { FileCacheAnalyzer } from "./fileCacheAnalyzer";
 import { convertFileIntoArray } from "./fileNavigatior";
 
 interface TagLocation {
@@ -26,10 +26,21 @@ export function locationsWhereTagIsUsed(findTag: string): Array<TagLocation> {
     const results = [];
     for(const file of oApp.vault.getMarkdownFiles()) {
         const cache: CachedMetadata = oApp.metadataCache.getFileCache(file);
-        if(cache.tags)
-            for(const tag of cache.tags) 
-                if(findTag === tag.tag)
+        if(cache.tags) {
+            for(const tag of cache.tags) {
+                if(findTag === tag.tag) {
                     results.push( { tag:tag, filePath: file.path, position: tag.position})
+                }
+            }
+            // Tag findTagObject = new Tag
+            const {frontmatter} = oApp.metadataCache.getFileCache(file) || {};
+            const fmtags = (parseFrontMatterTags(frontmatter) || []).filter(tag => findTag == tag || tag.startsWith(findTag + "/"));
+            if (fmtags.length) {
+                results.push( {tag:null, filePath: file.path, position: null})
+            }
+            // const aliasTags = (parseFrontMatterAliases(frontmatter) || []).filter(Tag.isTag).filter(findTag.matches);
+        
+        }
     }
     return results.sort((a:TagLocation,b:TagLocation)=> a.filePath.localeCompare(b.filePath))
 }

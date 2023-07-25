@@ -1,8 +1,8 @@
 import { TFile, Notice, LinkCache, getLinkpath } from "obsidian";
 import ThePlugin from '../main';
-import { FileCacheAnalyzer, CacheDetails } from '../utils/FileCacheAnalyzer';
+import { FileCacheAnalyzer, CacheDetails } from '../utils/fileCacheAnalyzer';
 import { SuggesterItem } from "../ui/GenericFuzzySuggester";
-import { displayFileLineSuggester, openFileInObsidian, parseBookmarkForItsElements, getUniqueLinkPath } from "../utils/fileNavigatior";
+import { displayFileLineSuggester, openFileInObsidian, openFileInObsidianInSameTab, parseBookmarkForItsElements, getUniqueLinkPath } from "../utils/fileNavigatior";
 import { generateBlockId } from "../utils/blockId";
 import { getActiveView } from "../utils/views";
 
@@ -89,11 +89,12 @@ export async function copyOrPushLineOrSelectionToNewLocationWithFileLineSuggeste
     if (selectedText === "") selectedText = activeEditor.getLine(activeEditor.getCursor().line); //get text from current line
     await displayFileLineSuggester(plugin, false, true, false, async (targetFileName, fileContentsArray, lineNumber, endLineNumber, evtFileSelected, evtFirstLine) => {
         await copyOrPushLineOrSelectionToNewLocation(plugin, copySelection, selectedText, targetFileName, lineNumber, fileContentsArray);
-        if ((evtFileSelected && (evtFileSelected.ctrlKey || evtFileSelected.metaKey)) || (evtFirstLine && (evtFirstLine.ctrlKey || evtFirstLine.metaKey))) {
+        // if ((evtFileSelected && (evtFileSelected.ctrlKey || evtFileSelected.metaKey)) || (evtFirstLine && (evtFirstLine.ctrlKey || evtFirstLine.metaKey))) {
             const linesSelected = selectedText.split("\n").length;
             const lineCount = linesSelected > 1 ? linesSelected - 1 : 0;
-            openFileInObsidian(plugin, targetFileName, lineNumber + 1, lineCount)
-        }
+            // openFileInObsidian(plugin, targetFileName, lineNumber + 1, lineCount)
+            openFileInObsidianInSameTab(plugin, targetFileName, lineNumber + 1, lineCount)
+        // }
     });
 } 
 
