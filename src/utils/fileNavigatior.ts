@@ -71,7 +71,8 @@ export async function openFileInObsidianInSameTab(plugin: ThePlugin, filePath: s
         const editor: Editor = getActiveView(plugin).editor;
         editor.setSelection(
             { line: gotoStartLineNumber, ch: 0 },
-            { line: gotoStartLineNumber + lineCount, ch: editor.getLine(gotoStartLineNumber + lineCount).length }
+            { line: gotoStartLineNumber, ch: 0 }
+            //{ line: gotoStartLineNumber + lineCount, ch: editor.getLine(gotoStartLineNumber + lineCount).length }
         );
         editor.scrollIntoView({
             from: { line: gotoStartLineNumber + lineCount, ch: 0 },
